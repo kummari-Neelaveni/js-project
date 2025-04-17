@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RedBus Sleeper Seat Layout</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    .card {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .gender-select {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .gender-select label {
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .legend div {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-box {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+    }
+
+    .available-box { background-color: #ddd; border: 1px solid #666; }
+    .booked-box { background-color: #dc3545; }
+    .selected-box { background-color: #28a745; }
+
+    .deck-title {
+      font-weight: bold;
+      margin: 20px 0 10px 10px;
+      font-size: 18px;
+    }
+
+    .deck {
+      display: grid;
+      grid-template-columns: repeat(6, 110px);
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .seat {
+      height: 50px;
+      background-color: #ddd;
+      border: 2px solid #666;
+      border-radius: 8px;
+      text-align: center;
+      line-height: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .seat.booked {
+      background-color: #d18a91;
+      color: white;
+      cursor: not-allowed;
+    }
+
+    .seat.selected {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .aisle {
+      background-color: transparent;
+      border: none;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <p style="background-color: rgb(70, 70, 209);border-radius: 1rem; color: #f4f4f4;">
+      Click on an Available seat to proceed with your transaction.
+    </p>
+
+    <div class="gender-select">
+      <label><input type="radio" name="gender" value="male" checked> Male</label>
+      <label><input type="radio" name="gender" value="female"> Female</label>
+    </div>
+
+    <div class="legend">
+      <div><div class="legend-box available-box"></div> Available</div>
+      <div><div class="legend-box booked-box"></div> Unavailable</div>
+      <div><div class="legend-box selected-box"></div> Selected</div>
+    </div>
+
+    <div class="deck-title">Lower Deck</div>
+    <div class="deck" id="lowerDeck"></div>
+
+    <div class="deck-title">Upper Deck</div>
+    <div class="deck" id="upperDeck"></div>
+
+    <div id="seatSummary" style="text-align:center; font-weight:bold; margin: 20px 0;">
+      Selected Seats: 0 | Total Price: ₹0
+    </div>
+
+    <div id="priceInfo" style="font-size: 18px; font-weight: bold; margin: 20px;"></div>
+    <button id="proceedBtn">Proceed to Booking</button>
+  </div>
+
+  <script>
+    const selectedBus = JSON.parse(localStorage.getItem("selectedBus"));
+    let SEAT_PRICE = 0;
+    let layoutType = "2+1"; // default layout
+
+    if (selectedBus) {
+      const priceText = selectedBus.money;
+      const match = priceText.match(/\d+/);
+      SEAT_PRICE = match ? parseInt(match[0]) : 0;
+      layoutType = selectedBus.type.includes("2+2") ? "2+2" : "2+1";
+      document.getElementById("priceInfo").innerText = `Price: ₹${SEAT_PRICE}`;
+    } else {
+      document.getElementById("priceInfo").innerText = "No bus selected.";
+    }
+
+    const getSelectedGender = () => document.querySelector('input[name="gender"]:checked').value;
+
+    function updatePriceDisplay() {
+      const selectedSeats = document.querySelectorAll('.seat.selected');
+      const seatCount = selectedSeats.length;
+      const total = seatCount * SEAT_PRICE;
+      document.getElementById('seatSummary').innerText = `Selected Seats: ${seatCount} | Total Price: ₹${total}`;
+    }
+
+    function createSeat(seatData) {
+      const seat = document.createElement('div');
+      seat.className = 'seat';
+      seat.innerText = seatData.id;
+
+      if (seatData.booked) {
+        seat.classList.add('booked');
+      } else {
+        seat.addEventListener('click', () => {
+          seat.classList.toggle('selected');
+          if (seat.classList.contains('selected')) {
+            seat.setAttribute('data-gender', getSelectedGender());
+          } else {
+            seat.removeAttribute('data-gender');
+          }
+          updatePriceDisplay();
+        });
+      }
+
+      return seat;
+    }
+
+    function renderDeck(deckId, data, layout) {
+      const container = document.getElementById(deckId);
+      container.innerHTML = "";
+      let seatIndex = 0;
+
+      const cols = layout === "2+2" ? 4 : 3;
+      const rows = Math.ceil(data.length / cols);
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          if (layout === "2+1" && col === 2) {
+            const aisle = document.createElement('div');
+            aisle.className = 'seat aisle';
+            container.appendChild(aisle);
+          } else {
+            if (seatIndex >= data.length) break;
+            const seat = createSeat(data[seatIndex++]);
+            container.appendChild(seat);
+          }
+        }
+      }
+    }
+
+    // Generate mock seat data
+    const lowerDeckData = Array.from({ length: 20 }, (_, i) => ({
+      id: `L${i + 1}`,
+      booked: Math.random() < 0.3
+    }));
+
+    const upperDeckData = Array.from({ length: 20 }, (_, i) => ({
+      id: `U${i + 1}`,
+      booked: Math.random() < 0.3
+    }));
+
+    // Render seats based on layout type
+    renderDeck("lowerDeck", lowerDeckData, layoutType);
+    renderDeck("upperDeck", upperDeckData, layoutType);
+    updatePriceDisplay();
+
+    // Proceed Button Logic
+    document.getElementById('proceedBtn').addEventListener('click', () => {
+      const selectedSeats = document.querySelectorAll('.seat.selected');
+      if (selectedSeats.length === 0) {
+        alert('Please select at least one seat to proceed.');
+        return;
+      }
+
+      const seatIds = Array.from(selectedSeats).map(seat => seat.innerText);
+      const genders = Array.from(selectedSeats).map(seat => seat.getAttribute('data-gender'));
+
+      localStorage.setItem('selectedSeats', JSON.stringify(seatIds));
+      localStorage.setItem('genders', JSON.stringify(genders));
+      window.location.href = 'passengerDetails.html';
+    });
+  </script>
+</body>
+</html>

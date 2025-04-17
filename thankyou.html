@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Thank You for Booking</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 30px;
+    }
+
+    .ticket {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: green;
+    }
+
+    .info {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .highlight {
+      font-weight: bold;
+    }
+
+    .btn {
+      margin-top: 20px;
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background-color: #074a91;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="ticket" id="ticketContent">
+    <h2>🎉 Thank You for Booking!</h2>
+    <div class="info"><span class="highlight">Booking ID:</span> <span id="bookingId"></span></div>
+    <div class="info"><span class="highlight">Travels:</span> <span id="travelsName"></span></div>
+    <div class="info"><span class="highlight">Route:</span> <span id="route"></span></div>
+    <div class="info"><span class="highlight">Seats:</span> <span id="seats"></span></div>
+    <div class="info"><span class="highlight">Total Amount:</span> ₹<span id="total"></span></div>
+    <div class="info"><span class="highlight">Status:</span> <span id="status"></span></div>
+    <div class="info"><span class="highlight">Booked At:</span> <span id="bookedAt"></span></div>
+
+    <h3>Passenger Details:</h3>
+    <div id="passengerList"></div>
+
+    <button class="btn" onclick="downloadTicket()">Download Ticket</button>
+  </div>
+
+  <script>
+    const booking = JSON.parse(localStorage.getItem("latestBooking"));
+if (!booking) {
+  alert("No booking found. Please book again.");
+  window.location.href = "index.html";
+
+
+    } else {
+      document.getElementById("bookingId").textContent = booking.bookingId;
+      document.getElementById("travelsName").textContent = booking.travelsName;
+      document.getElementById("route").textContent = booking.route || "N/A";
+      document.getElementById("seats").textContent = booking.seats.join(", ");
+      document.getElementById("total").textContent = booking.totalAmount;
+      document.getElementById("status").textContent = booking.status;
+      document.getElementById("bookedAt").textContent = new Date(booking.bookedAt).toLocaleString();
+
+      const passengerList = document.getElementById("passengerList");
+      booking.passengers.forEach(p => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <div class="info">
+            <span class="highlight">Seat:</span> ${p.seat}, 
+            <span class="highlight">Name:</span> ${p.name}, 
+            <span class="highlight">Age:</span> ${p.age}, 
+            <span class="highlight">Gender:</span> ${p.gender}
+          </div>`;
+        passengerList.appendChild(div);
+      });
+    }
+
+    function downloadTicket() {
+      const content = document.getElementById("ticketContent").innerHTML;
+      const blob = new Blob([content], { type: "text/html" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${booking.bookingId}_ticket.html`;
+      link.click();
+    }
+  </script>
+</body>
+</html>

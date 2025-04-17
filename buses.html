@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RedBus Clone - Bus List</title>
+  <style>
+    body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 20px;
+  padding: 20px;
+}
+
+.sidebar {
+  background:#1c55aa;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+  max-height: 300vh;
+}
+
+.sidebar h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.sidebar h3 {
+  font-weight: 500;
+  margin: 20px 0 10px;
+  font-size: 15px;
+}
+
+.sidebar label {
+  display: block;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+#busDetails {
+  background: #f5f1f1;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+#busDetails img {
+  width: 60px;
+  height: auto;
+  object-fit: contain;
+}
+
+#ratingGreen {
+  background-color: #4caf50;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.btn {
+  background-color: #4e8ad8;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn:hover {
+  background-color: #1579a7;
+}
+
+.bus-list-container {
+  padding-right: 20px;
+}
+
+#fromTo {
+  padding: 20px;
+  font-size: 18px;
+  font-weight: 600;
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr; /* Stack sidebar and main content */
+  }
+
+  .sidebar {
+    max-height: none; /* Remove max-height on smaller screens */
+    margin-bottom: 20px;
+  }
+
+  .sidebar h2, .sidebar h3 {
+    font-size: 16px; /* Smaller headings */
+  }
+
+  .sidebar label {
+    font-size: 14px; /* Smaller label text */
+  }
+
+  #busDetails {
+    grid-template-columns: repeat(4, 1fr); /* Use fewer columns for small screens */
+  }
+
+  #busDetails img {
+    width: 50px; /* Smaller images */
+  }
+
+  .btn {
+    width: 100%; /* Make buttons full width */
+    padding: 10px 0; /* Adjust padding for buttons */
+  }
+
+  #fromTo {
+    font-size: 16px; /* Smaller text size */
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    padding: 15px;
+  }
+
+  .sidebar h2, .sidebar h3 {
+    font-size: 14px; /* Even smaller text for mobile */
+  }
+
+  #busDetails {
+    grid-template-columns: repeat(2, 1fr); /* Even fewer columns on mobile */
+  }
+
+  .btn {
+    padding: 12px 0; /* Adjust padding for better touch targets */
+  }
+
+  #fromTo {
+    font-size: 14px;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <div id="fromTo"></div>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Filters</h2>
+
+      <h3>Departure Time</h3>
+      <label><input type="checkbox" name="departure" value="before6am"> Before 6 am</label>
+      <label><input type="checkbox" name="departure" value="6to12"> 6 am to 12 pm</label>
+      <label><input type="checkbox" name="departure" value="12to6"> 12 pm to 6 pm</label>
+      <label><input type="checkbox" name="departure" value="after6pm"> After 6 pm</label>
+
+      <h3>Bus Types</h3>
+      <label><input type="checkbox" name="type" value="seater"> Seater</label>
+      <label><input type="checkbox" name="type" value="sleeper"> Sleeper</label>
+      <label><input type="checkbox" name="type" value="ac"> AC</label>
+      <label><input type="checkbox" name="type" value="non-ac"> NON-AC</label>
+
+      <h3>Amenities</h3>
+      <label><input type="checkbox" name="amenities" value="Water Bottle"> Water Bottle</label>
+      <label><input type="checkbox" name="amenities" value="Blankets"> Blankets</label>
+      <label><input type="checkbox" name="amenities" value="Charging Point"> Charging Point</label>
+      <label><input type="checkbox" name="amenities" value="Toilet"> Toilet</label>
+      <label><input type="checkbox" name="amenities" value="Bed Sheet"> Bed Sheet</label>
+
+      <h3>Dropping Point</h3>
+      <label><input type="checkbox" name="dropping" value="Kukatpally"> Kukatpally</label>
+      <label><input type="checkbox" name="dropping" value="Ameerpet"> Ameerpet</label>
+      <label><input type="checkbox" name="dropping" value="Miyapur"> Miyapur</label>
+
+      <h3>Operator</h3>
+      <label><input type="checkbox" name="operator" value="Orange Travels"> Orange Travels</label>
+      <label><input type="checkbox" name="operator" value="SRS Travels"> SRS Travels</label>
+      <label><input type="checkbox" name="operator" value="VRL"> VRL</label>
+    </div>
+
+    <!-- Bus Listings -->
+    <div id="mainDiv" class="bus-list-container"></div>
+  </div>
+
+  <script>
+    const fromTo = document.getElementById("fromTo");
+    const mainDiv = document.getElementById("mainDiv");
+    let allBusData = [];
+
+    const userData = JSON.parse(localStorage.getItem("userData")) || {
+      from: "Hyderabad",
+      to: "Mumbai"
+    };
+
+    fromTo.innerHTML = `<strong>Bus Tickets: ${userData.from} → ${userData.to}</strong>`;
+
+    const filters = {
+      departure: [],
+      type: [],
+      amenities: [],
+      dropping: [],
+      operator: []
+    };
+
+    async function fetchBusData() {
+      try {
+        const res = await fetch("https://busapi-cl03.onrender.com/buses");
+        allBusData = await res.json();
+        applyFilters();
+      } catch (error) {
+        mainDiv.innerHTML = "<p>Failed to load bus data.</p>";
+      }
+    }
+
+    function applyFilters() {
+      let filtered = [...allBusData];
+
+      // Filter by Departure Time
+      if (filters.departure.length) {
+        filtered = filtered.filter(bus => {
+          const hour = parseInt(bus.boardingTime.split(":")[0]);
+          return filters.departure.some(time => {
+            if (time === "before6am") return hour < 6;
+            if (time === "6to12") return hour >= 6 && hour < 12;
+            if (time === "12to6") return hour >= 12 && hour < 18;
+            if (time === "after6pm") return hour >= 18;
+          });
+        });
+      }
+
+      // Filter by Bus Type
+      if (filters.type.length) {
+        filtered = filtered.filter(bus =>
+          filters.type.some(type => bus.type.toLowerCase().includes(type))
+        );
+      }
+
+     
+
+      // Filter by Dropping Point
+      if (filters.dropping.length) {
+        filtered = filtered.filter(bus =>
+          filters.dropping.includes(bus.dropingPlace)
+        );
+      }
+
+      // Filter by Operator
+      if (filters.operator.length) {
+        filtered = filtered.filter(bus =>
+          filters.operator.includes(bus.title)
+        );
+      }
+
+      renderBusList(filtered);
+    }
+
+    function renderBusList(data) {
+      mainDiv.innerHTML = "";
+      if (!data.length) {
+        mainDiv.innerHTML = "<p>No buses found with selected filters.</p>";
+        return;
+      }
+
+      data.forEach(bus => {
+        mainDiv.innerHTML += `
+          <div id="busDetails">
+            <div><img src="${bus.logo}" alt="logo" /></div>
+            <div><b>${bus.title}</b><p>${bus.type}</p></div>
+            <div><b>${bus.boardingTime}</b><p>${bus.boardingPlace}</p></div>
+            <div><p>${bus.totalHours}</p></div>
+            <div><b>${bus.dropingTime}</b><p>${bus.dropingPlace}</p></div>
+            <div><p id="ratingGreen">${bus.rating}</p></div>
+            <div><p>${bus.rate}</p><b>${bus.money}</b></div>
+            <div>
+              <p>${bus.seats}</p>
+              <p>${bus.single}</p>
+   <button class="btn" data-id="${bus.boardingTime}-${bus.title}">VIEW SEATS</button>
+            </div>
+          </div>
+        `;
+      });
+
+      document.querySelectorAll(".btn").forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    const busId = e.target.getAttribute("data-id");
+    const selectedBus = allBusData.find(
+      bus => `${bus.boardingTime}-${bus.title}` === busId
+    );
+
+    localStorage.setItem("selectedBus", JSON.stringify(selectedBus));
+    window.location.href = "seating.html";
+        });
+      });
+    }
+
+    // Listen to filter changes
+    document.querySelectorAll('.sidebar input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener("change", e => {
+        const { name, value, checked } = e.target;
+        if (!filters[name]) filters[name] = [];
+        if (checked) {
+          filters[name].push(value);
+        } else {
+          filters[name] = filters[name].filter(v => v !== value);
+        }
+        applyFilters();
+      });
+    });
+
+    fetchBusData();
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RedBus Clone - Auth</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      text-align: center;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      display: block;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #041383;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #0c8ac1;
+    }
+    .alt-option {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .alt-option a {
+      color: #007bff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="signupContainer">
+    <h2>Sign Up</h2>
+    <input type="email" id="signupEmail" placeholder="Email" />
+    <input type="password" id="signupPassword" placeholder="Password" />
+    <button id="btn1">Sign Up</button>
+    <button id="googleSignup">Sign Up with Google</button>
+    <button onclick="window.location.href='redbus.html'">Continue as Guest</button>
+    <p class="alt-option">Already have an account? <a href="#" id="goToLogin">Login</a></p>
+  </div>
+
+  <div class="container" id="loginContainer" style="display:none;">
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email" />
+    <input type="password" id="loginPassword" placeholder="Password" />
+    <button id="btn2">Login</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      GoogleAuthProvider,
+      signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUvsnGvb2O9b7EkPdxdnbHZxqRbLJpt6Q",
+      authDomain: "redbus1-b1c1d.firebaseapp.com",
+      projectId: "redbus1-b1c1d",
+      storageBucket: "redbus1-b1c1d.appspot.com",
+      messagingSenderId: "774950462077",
+      appId: "1:774950462077:web:f5f3043a6745bce1870714"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Email sign up
+    // Email sign up → Redirect to Login
+document.getElementById("btn1").addEventListener("click", () => {
+  const email = document.getElementById("signupEmail").value;
+  const password = document.getElementById("signupPassword").value;
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      alert("Signup successful! Please log in.");
+      // Show login form
+      document.getElementById("signupContainer").style.display = "none";
+      document.getElementById("loginContainer").style.display = "block";
+      // Pre-fill email
+      document.getElementById("loginEmail").value = email;
+    })
+    .catch(error => {
+      alert("Signup failed: " + error.message);
+    });
+});
+
+
+    // Email login
+    document.getElementById("btn2").addEventListener("click", () => {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Login successful!");
+          window.location.href = "redbus.html";
+        })
+        .catch(error => {
+          alert("Login failed: " + error.message);
+        });
+    });
+
+    // Switch to login
+    document.getElementById("goToLogin").addEventListener("click", () => {
+      document.getElementById("signupContainer").style.display = "none";
+      document.getElementById("loginContainer").style.display = "block";
+    });
+
+    // Google Sign-Up/Login
+    document.getElementById("googleSignup").addEventListener("click", () => {
+      signInWithPopup(auth, provider)
+        .then(result => {
+          const user = result.user;
+          alert(`Welcome ${user.displayName || user.email}`);
+          window.location.href = "redbus.html";
+        })
+        .catch(error => {
+          alert("Google login failed: " + error.message);
+        });
+    });
+  </script>
+</body>
+</html>

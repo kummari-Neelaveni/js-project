@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Bus</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    input, button {
+      display: block;
+      margin: 10px 0;
+      padding: 8px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h2>Add Bus Details</h2>
+  <form id="busForm">
+    <input type="text" id="logo" placeholder="Logo URL" required />
+    <input type="text" id="type" placeholder="Type" required />
+    <input type="text" id="title" placeholder="Title" required />
+    <input type="text" id="boardingTime" placeholder="Boarding Time" required />
+    <input type="text" id="boardingPlace" placeholder="Boarding Place" required />
+    <input type="text" id="totalHours" placeholder="Total Hours" required />
+    <input type="text" id="dropingTime" placeholder="Dropping Time" required />
+    <input type="text" id="dropingPlace" placeholder="Dropping Place" required />
+    <input type="text" id="rating" placeholder="Rating" required />
+    <input type="text" id="rate" placeholder="Rate text (e.g., Starts from)" required />
+    <input type="text" id="money" placeholder="Price (e.g., INR 650)" required />
+    <input type="text" id="seats" placeholder="Seats available (e.g., 15 Seats available)" required />
+    <input type="text" id="single" placeholder="Single seats (e.g., 9 Single)" required />
+    <button type="submit">Add Bus</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('busForm');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const busData = {
+        logo: document.getElementById('logo').value,
+        type: document.getElementById('type').value,
+        title: document.getElementById('title').value,
+        boardingTime: document.getElementById('boardingTime').value,
+        boardingPlace: document.getElementById('boardingPlace').value,
+        totalHours: document.getElementById('totalHours').value,
+        dropingTime: document.getElementById('dropingTime').value,
+        dropingPlace: document.getElementById('dropingPlace').value,
+        rating: document.getElementById('rating').value,
+        rate: document.getElementById('rate').value,
+        money: document.getElementById('money').value,
+        seats: document.getElementById('seats').value,
+        single: document.getElementById('single').value
+      };
+
+      try {
+        const res = await fetch('http://localhost:3000/buses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(busData)
+        });
+
+        if (res.ok) {
+          alert('Bus added successfully!');
+          form.reset();
+        } else {
+          const err = await res.json();
+          console.error('Failed to add bus:', err);
+          alert('Error while adding bus.');
+        }
+      } catch (error) {
+        // console.error('Error:', error);
+        alert('Error while connecting to server.');
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
