@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>View Bookings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4; /* White background for the whole page */
+      color: #333; /* Dark text for readability */
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #1976d2;
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+
+    .bookings-grid {
+      display: flex;
+      flex-wrap: wrap; /* Allows wrapping of cards if they don't fit */
+      justify-content: space-between; /* Distributes cards evenly */
+      gap: 30px; /* Spacing between cards */
+      padding: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .booking-card {
+      width: 30%; /* Set each card to take 30% width of the container */
+      background-color: white; /* White background for the card */
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 2px solid #ddd; /* Light border for the card */
+      height: 380px; /* Fixed height for uniformity */
+    }
+
+    .booking-card h3 {
+      margin: 0;
+      color: #333;
+      font-size: 22px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .booking-info {
+      font-size: 14px;
+      margin: 8px 0;
+      color: #555; /* Darker text for readability */
+    }
+
+    .booking-info strong {
+      color: #000;
+    }
+
+    .passenger-list {
+      margin-top: 10px;
+      padding-left: 18px;
+    }
+
+    .passenger-list li {
+      font-size: 13px;
+      color: #777; /* Lighter text for passenger info */
+    }
+
+    /* Media query for smaller screens */
+    @media (max-width: 1024px) {
+      .booking-card {
+        width: 45%; /* 2 cards per row on medium screens */
+      }
+    }
+
+    @media (max-width: 768px) {
+      .booking-card {
+        width: 100%; /* 1 card per row on smaller screens */
+      }
+    }
+
+    .back-btn {
+      background-color: #1976d2;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
+
+    .back-btn:hover {
+      background-color: #1565c0;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>View Bookings</h1>
+</header>
+
+<div class="bookings-grid" id="bookingsContainer">
+  <!-- Booking cards will be inserted here -->
+</div>
+
+<div class="container">
+  <button class="back-btn" onclick="window.location.href='admin-dashboard.html'">Back to Dashboard</button>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDUvsnGvb2O9b7EkPdxdnbHZxqRbLJpt6Q",
+    authDomain: "redbus1-b1c1d.firebaseapp.com",
+    projectId: "redbus1-b1c1d",
+    storageBucket: "redbus1-b1c1d.appspot.com",
+    messagingSenderId: "774950462077",
+    appId: "1:774950462077:web:67ba78bad934bb6c870714"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Fetch and render bookings
+  const bookingsContainer = document.getElementById("bookingsContainer");
+
+  const fetchBookings = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "bookings"));
+      if (querySnapshot.empty) {
+        bookingsContainer.innerHTML = "<p>No bookings found.</p>";
+        return;
+      }
+
+      querySnapshot.forEach(doc => {
+        const booking = doc.data();
+        const card = document.createElement("div");
+        card.className = "booking-card";
+
+        let passengersHTML = '';
+        if (Array.isArray(booking.passengers)) {
+          passengersHTML = booking.passengers.map(p => `
+            <li>${p.name} (${p.gender}, Age: ${p.age}) - Seat: ${p.seat}</li>
+          `).join("");
+        }
+
+        const formattedDate = new Date(booking.bookedAt).toLocaleString('en-IN', {
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        });
+
+        card.innerHTML = `
+          <h3>${booking.travelsName || "Unnamed Bus"}</h3>
+          <p><strong>Booking ID:</strong> ${booking.bookingId || doc.id}</p>
+          <p><strong>Status:</strong> ${booking.status || "Unknown"}</p>
+          <p><strong>Booked At:</strong> ${formattedDate || "N/A"}</p>
+          <p><strong>Seats:</strong> ${booking.seats?.join(", ") || "N/A"}</p>
+          <p><strong>Total Amount:</strong> ₹${booking.totalAmount || 0}</p>
+          <p><strong>Passengers:</strong></p>
+          <ul>${passengersHTML || "<li>No passengers data</li>"}</ul>
+        `;
+
+        bookingsContainer.appendChild(card);
+      });
+    } catch (error) {
+      bookingsContainer.innerHTML = "<p>Error loading bookings.</p>";
+      console.error("Error fetching bookings:", error);
+    }
+  };
+
+  fetchBookings();
+</script>
+
+</body>
+</html>

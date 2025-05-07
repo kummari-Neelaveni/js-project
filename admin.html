@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+    header {
+      background: #1976d2;
+      color: white;
+      padding: 15px 30px;
+      text-align: center;
+    }
+    .dashboard-container {
+      padding: 20px;
+    }
+    .btn {
+      background: #1976d2;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .btn:hover {
+      background: #1565c0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Admin Dashboard</h1>
+    <button class="btn" id="logoutBtn">Logout</button>
+  </header>
+
+  <div class="dashboard-container">
+    <h2>Welcome to the Admin Dashboard</h2>
+    <p>This is where you can manage bus data and other admin functions.</p>
+    <button class="btn" id="manageBusesBtn">Manage Buses</button>
+    <button class="btn" id="viewBookingsBtn">View Bookings</button>
+  </div>
+
+  <script>
+    // Check if admin is logged in
+    if (!localStorage.getItem("adminLoggedIn")) {
+      alert("Access denied. Please login as admin.");
+      window.location.href = "admin-login.html"; // Redirect to login page if not logged in
+    }
+
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      localStorage.removeItem('adminLoggedIn');
+      window.location.href = 'admin-login.html'; // Redirect to login page after logout
+    });
+
+    // Route to Manage Buses page
+    document.getElementById('manageBusesBtn').addEventListener('click', function() {
+      window.location.href = 'manage-buses.html'; // Redirect to manage buses page
+    });
+
+    // Route to View Bookings page
+    document.getElementById('viewBookingsBtn').addEventListener('click', function() {
+      window.location.href = 'view-bookings.html'; // Redirect to view bookings page
+    });
+  </script>
+
+</body>
+</html>
+

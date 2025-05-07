@@ -207,9 +207,10 @@
     let allBusData = [];
 
     const userData = JSON.parse(localStorage.getItem("userData")) || {
-      from: "Hyderabad",
-      to: "Mumbai"
+      from: ".",
+    to: "..."
     };
+
 
     fromTo.innerHTML = `<strong>Bus Tickets: ${userData.from} → ${userData.to}</strong>`;
 

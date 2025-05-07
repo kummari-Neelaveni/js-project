@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Bus</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      padding: 30px;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      width: 50%;
+      margin: 0 auto;
+    }
+    .btn {
+      background: #1976d2;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+    .btn:hover {
+      background: #135ba1;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .rate-label {
+      font-size: 16px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Edit Bus</h2>
+    <form id="editBusForm">
+      <input type="text" id="title" placeholder="Bus Title" required />
+      <input type="text" id="boardingPlace" placeholder="Boarding Place" required />
+      <input type="text" id="boardingTime" placeholder="Boarding Time" required />
+      <input type="text" id="dropingPlace" placeholder="Dropping Place" required />
+      <input type="text" id="dropingTime" placeholder="Dropping Time" required />
+      <input type="text" id="totalHours" placeholder="Total Hours" required />
+      <input type="number" id="rating" placeholder="Rating" required />
+      <input type="number" id="money" placeholder="Price" required />
+      <input type="number" id="seats" placeholder="Seats Available" required />
+      
+      <!-- Added Type and Logo Fields -->
+      <input type="text" id="type" placeholder="Bus Type (e.g., A/C Sleeper)" required />
+      <input type="text" id="logo" placeholder="Bus Logo URL" required />
+      
+      <!-- Added fields for single seats and rate -->
+      <input type="number" id="single" placeholder="Single Seats Available" required />
+      
+      <label for="rate" class="rate-label">Rate (in ₹)</label>
+      <input type="number" id="rate" placeholder="Rate per Seat" required />
+      
+      <button type="submit" class="btn">Update Bus</button>
+    </form>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const busId = urlParams.get("busId"); // Retrieve the busId from the query parameter
+
+    async function fetchBusDetails(busId) {
+      try {
+        const response = await fetch(`https://busapi-cl03.onrender.com/buses/${busId}`);
+        if (!response.ok) throw new Error("Failed to fetch bus details.");
+        const bus = await response.json();
+
+        document.getElementById("title").value = bus.title;
+        document.getElementById("boardingPlace").value = bus.boardingPlace;
+        document.getElementById("boardingTime").value = bus.boardingTime;
+        document.getElementById("dropingPlace").value = bus.dropingPlace;
+        document.getElementById("dropingTime").value = bus.dropingTime;
+        document.getElementById("totalHours").value = bus.totalHours;
+        document.getElementById("rating").value = bus.rating;
+        document.getElementById("money").value = bus.money;
+        document.getElementById("seats").value = bus.seats;
+        
+        // Set the type and logo fields
+        document.getElementById("type").value = bus.type;
+        document.getElementById("logo").value = bus.logo;
+        
+        // Set the new single and rate fields
+        document.getElementById("single").value = bus.single;
+        document.getElementById("rate").value = bus.rate;
+      } catch (error) {
+        console.error("Error loading bus details:", error);
+      }
+    }
+
+    async function updateBus(busId, busData) {
+      try {
+        const res = await fetch(`https://busapi-cl03.onrender.com/buses/${busId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(busData)
+        });
+
+        if (res.ok) {
+          alert("Bus details updated successfully!");
+          window.location.href = "manage-buses.html"; // Redirect back to manage buses page
+        } else {
+          alert("Failed to update bus details.");
+        }
+      } catch (error) {
+        console.error("Error updating bus:", error);
+        alert("Error updating bus.");
+      }
+    }
+
+    document.getElementById("editBusForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const updatedBus = {
+        title: document.getElementById("title").value,
+        boardingPlace: document.getElementById("boardingPlace").value,
+        boardingTime: document.getElementById("boardingTime").value,
+        dropingPlace: document.getElementById("dropingPlace").value,
+        dropingTime: document.getElementById("dropingTime").value,
+        totalHours: document.getElementById("totalHours").value,
+        rating: document.getElementById("rating").value,
+        money: document.getElementById("money").value,
+        seats: document.getElementById("seats").value,
+        
+        // Adding type and logo values
+        type: document.getElementById("type").value,
+        logo: document.getElementById("logo").value,
+        
+        // Adding the new fields
+        single: document.getElementById("single").value,
+        rate: document.getElementById("rate").value
+      };
+
+      updateBus(busId, updatedBus); // Call the update function
+    });
+
+    fetchBusDetails(busId); // Fetch bus details when the page loads
+  </script>
+
+</body>
+</html>
+
+
+
+ 
