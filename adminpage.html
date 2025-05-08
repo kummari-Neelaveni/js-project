@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1017,5 +1017,193 @@
         });
     </script>
 </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login / Sign Up</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    button {
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #135ca5;
+    }
+    .toggle-btn {
+      background: none;
+      color: #1976d2;
+      border: none;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .message {
+      text-align: center;
+      color: green;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+    #githubLoginBtn {
+      background-color: #333;
+      color: white;
+      border: none;
+      padding: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #githubLoginBtn:hover {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2 id="form-title">Login</h2>
+    <div id="error" class="error"></div>
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button id="submit-btn">Login</button>
+
+    <p class="message" id="success-msg"></p>
+
+    <p style="text-align: center;">
+      <span id="toggle-msg">Don't have an account?</span>
+      <button class="toggle-btn" id="toggle-form">Sign Up</button>
+    </p>
+
+    <!-- GitHub Login Button -->
+    <button id="githubLoginBtn">Login with GitHub</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUvsnGvb2O9b7EkPdxdnbHZxqRbLJpt6Q",
+      authDomain: "redbus1-b1c1d.firebaseapp.com",
+      projectId: "redbus1-b1c1d",
+      storageBucket: "redbus1-b1c1d.appspot.com",
+      messagingSenderId: "774950462077",
+      appId: "1:774950462077:web:f5f3043a6745bce1870714"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Elements
+    const formTitle = document.getElementById("form-title");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const submitBtn = document.getElementById("submit-btn");
+    const toggleBtn = document.getElementById("toggle-form");
+    const toggleMsg = document.getElementById("toggle-msg");
+    const successMsg = document.getElementById("success-msg");
+    const errorMsg = document.getElementById("error");
+
+    let isLogin = true;
+
+    toggleBtn.addEventListener("click", () => {
+      isLogin = !isLogin;
+      formTitle.textContent = isLogin ? "Login" : "Sign Up";
+      submitBtn.textContent = isLogin ? "Login" : "Sign Up";
+      toggleMsg.textContent = isLogin ? "Don't have an account?" : "Already have an account?";
+      toggleBtn.textContent = isLogin ? "Sign Up" : "Login";
+      errorMsg.textContent = "";
+      successMsg.textContent = "";
+    });
+
+    submitBtn.addEventListener("click", () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      errorMsg.textContent = "";
+      successMsg.textContent = "";
+
+      if (!email || !password) {
+        errorMsg.textContent = "Please fill in both fields.";
+        return;
+      }
+
+      if (isLogin) {
+        auth.signInWithEmailAndPassword(email, password)
+          .then(() => {
+            successMsg.textContent = "Login successful!";
+            setTimeout(() => {
+              window.location.href = 'admin-dashboard.html'; // Redirect to the admin dashboard
+            }, 1500);
+          })
+          .catch(err => {
+            errorMsg.textContent = err.message;
+          });
+      } else {
+        auth.createUserWithEmailAndPassword(email, password)
+          .then(() => {
+            successMsg.textContent = "Sign up successful! Please login.";
+            isLogin = true;
+            formTitle.textContent = "Login";
+            submitBtn.textContent = "Login";
+            toggleMsg.textContent = "Don't have an account?";
+            toggleBtn.textContent = "Sign Up";
+          })
+          .catch(err => {
+            errorMsg.textContent = err.message;
+          });
+      }
+    });
+
+    // GitHub login
+    document.getElementById('githubLoginBtn').addEventListener('click', () => {
+      const provider = new firebase.auth.GithubAuthProvider();
+      
+      auth.signInWithPopup(provider)
+        .then(result => {
+          // Successful login with GitHub
+          window.location.href = 'admin-dashboard.html'; // Redirect to the admin dashboard
+        })
+        .catch(err => {
+          errorMsg.textContent = err.message; // Show error message
+        });
+    });
+  </script>
+</body>
 </html>
+
 
