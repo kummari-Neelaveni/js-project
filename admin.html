@@ -48,17 +48,17 @@
   </div>
 
   <script>
-    // Check if admin is logged in
-    if (!localStorage.getItem("adminLoggedIn")) {
-      alert("Access denied. Please login as admin.");
-      window.location.href = "admin-login.html"; // Redirect to login page if not logged in
-    }
+    // // Check if admin is logged in
+    // if (!localStorage.getItem("adminLoggedIn")) {
+    //   alert("Access denied. Please login as admin.");
+    //   window.location.href = "admin-login.html"; // Redirect to login page if not logged in
+    // }
 
-    // Logout functionality
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-      localStorage.removeItem('adminLoggedIn');
-      window.location.href = 'admin-login.html'; // Redirect to login page after logout
-    });
+    // // Logout functionality
+    // document.getElementById('logoutBtn').addEventListener('click', function() {
+    //   localStorage.removeItem('adminLoggedIn');
+    //   window.location.href = 'admin-login.html'; // Redirect to login page after logout
+    // });
 
     // Route to Manage Buses page
     document.getElementById('manageBusesBtn').addEventListener('click', function() {
