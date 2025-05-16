@@ -1,12 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Choose Role</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+      text-align: center;
+      background: white;
+      padding: 40px 60px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    a {
+      display: inline-block;
+      margin: 10px 20px;
+      padding: 12px 30px;
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      background: #6c63ff;
+      text-decoration: none;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+    }
+
+    a:hover {
+      background: #4b47c3;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+  </style>
 </head>
 <body>
-    <a href="userpage.html">user</a> <br>
-    <a href="adminpage.html">admin</a>
+  <div class="container">
+    <h1>Choose Your Role</h1>
+    <a href="userpage.html">User</a>
+    <a href="adminpage.html">Admin</a>
+  </div>
 </body>
 </html>
+
